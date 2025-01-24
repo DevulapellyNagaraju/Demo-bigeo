@@ -1,5 +1,4 @@
-# Note:- Rahul bro nenu just demo chayesa inka frontend lo okka file lo set chayesa ...(App.js)  Easy to use and koni tests kuda chaye may if possible to you?
-# And backend API tho link chayesi manam anukunatu implement chaye... Ok bro take care.
+## Note:- Rahul bro nenu just demo chayesa inka frontend lo okka file lo set chayesa ...(App.js)  Easy to use and koni tests kuda chaye may if possible to you? And backend API tho link chayesi manam anukunatu implement chaye... Ok bro take care.
 
 
 # Getting Started with Create React App
