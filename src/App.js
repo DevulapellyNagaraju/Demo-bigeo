@@ -1,14 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+//App.js
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
 import "./Navbar.css"; // Import the CSS file
 import axios from "axios";
+
+import "./WelcomeSection.css"; // Import CSS for animations
 
 // Navbar Component
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
+  // Function to toggle the menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Function to close the menu when a link is clicked
+  const closeMenu = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -25,7 +35,8 @@ const Navbar = () => {
             <li key={index}>
               <Link
                 to={`/${text.toLowerCase().replace(/\s+/g, "-")}`}
-                className="nav-link"
+                className={`nav-link ${location.pathname === `/${text.toLowerCase().replace(/\s+/g, "-")}` ? "active" : ""}`}
+                onClick={closeMenu} // Close the menu when a link is clicked
               >
                 {text}
               </Link>
@@ -48,71 +59,176 @@ const Navbar = () => {
 
 // WelcomeSection Component (Home Page)
 const WelcomeSection = () => {
+  const [isAboutUsHovered, setIsAboutUsHovered] = useState(false);
+  const [isAboutUsPressed, setIsAboutUsPressed] = useState(false);
+
   const styles = {
     welcomeSection: {
+      position: "relative",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
       height: "100vh",
-      backgroundImage: `url("https://dimensions.edu.sg/programme/logistic/images/Supply-Chain-and-Logistics-Management.jpg")`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      color: "rgb(65, 71, 74)",
+      color: "#fff",
       textAlign: "center",
       padding: "20px",
       marginTop: "60px",
+      overflow: "hidden",
+    },
+    videoBackground: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      zIndex: -1,
+    },
+    videoOverlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      zIndex: -1,
     },
     welcomeTitle: {
       fontSize: "4rem",
       fontWeight: "bold",
       marginBottom: "20px",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+      fontFamily: "'Poppins', sans-serif",
+      animation: "fadeInDown 1.5s ease-out",
     },
     welcomeSubtitle: {
-      fontSize: "1.5rem",
+      fontSize: "1.3rem",
       fontWeight: "400",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+      fontFamily: "'Poppins', sans-serif",
+      animation: "fadeInUp 1.5s ease-out 0.5s",
+      opacity: 0,
+      animationFillMode: "forwards",
     },
     welcomeButton: {
+      position: "relative", // Required for pseudo-element
       marginTop: "30px",
-      padding: "15px 30px",
+      padding: "15px 40px",
       fontSize: "1rem",
       fontWeight: "600",
-      color: "White",
-      backgroundColor: "#6a11cb",
-      border: "none",
+      color: "white",
+      backgroundColor: "transparent",
+      border: "none", // Remove default border
       borderRadius: "50px",
       cursor: "pointer",
       transition: "all 0.3s ease-in-out",
+      boxShadow: "none",
+      animation: "fadeInUp 1.5s ease-out 1s",
+      opacity: 0,
+      animationFillMode: "forwards",
+      overflow: "hidden", // Ensure pseudo-element doesn't overflow
     },
-    welcomeButtonHover: {
-      transform: "scale(1.1)",
-      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-      
+    aboutUsButton: {
+      marginTop: "30px",
+      padding: "15px 40px",
+      fontSize: "1rem",
+      fontWeight: "600",
+      color: "white",
+      backgroundColor: "transparent",
+      border: "none", // No border by default
+      borderRadius: "50px",
+      cursor: "pointer",
+      transition: "all 0.3s ease-in-out",
+      boxShadow: "none",
+      animation: "fadeInUp 1.5s ease-out 1s",
+      opacity: 0,
+      animationFillMode: "forwards",
+      marginLeft: "20px", // Space between buttons
+    },
+    aboutUsButtonHover: {
+      border: "2px solid white", // Add border on hover
+    },
+    aboutUsButtonPressed: {
+      border: "2px solid #6a11cb", // Change border color when pressed
+    },
+    buttonContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
   };
 
   return (
     <section id="home" style={styles.welcomeSection}>
-      <h1 style={styles.welcomeTitle} className="text-6xl font-bold">
-        Welcome to BiGeo
-      </h1>
-      <p style={styles.welcomeSubtitle} className="text-xl">
-        Your ultimate logistics and supply chain solution
+      {/* Background Video */}
+      <video autoPlay loop muted style={styles.videoBackground}>
+        <source
+          src="https://cdn.pixabay.com/video/2020/06/03/40984-427854579_large.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Video Overlay */}
+      <div style={styles.videoOverlay}></div>
+
+      {/* Welcome Content */}
+      <h1 style={styles.welcomeTitle}>Welcome to BiGeo</h1>
+      <p style={styles.welcomeSubtitle}>
+        your ultimate partner for efficient, sustainable, and intelligent <br />
+        logistics and supply chain solutions tailored to India’s dynamic growth.
       </p>
-      <button
-        style={styles.welcomeButton}
-        className="hover:scale-110 hover:shadow-lg"
-        onMouseEnter={(e) => {
-          e.target.style.transform = styles.welcomeButtonHover.transform;
-          e.target.style.boxShadow = styles.welcomeButtonHover.boxShadow;
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = "scale(1)";
-          e.target.style.boxShadow = "none";
-        }}
-      >
-        Get Started
-      </button>
+
+      {/* Button Container */}
+      <div style={styles.buttonContainer}>
+        {/* Get Started Button */}
+        <button
+          style={styles.welcomeButton}
+        >
+          Get Started
+          {/* Gradient Border Pseudo-Element */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: "50px",
+              padding: "2px", // Border width
+              background: "linear-gradient(90deg, #6a11cb, #2575fc, #6a11cb)",
+              backgroundSize: "200% 100%", // Double the width for animation
+              animation: "moveGradient 3s linear infinite", // Animation for gradient
+              WebkitMask:
+                "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+              WebkitMaskComposite: "xor",
+              maskComposite: "exclude",
+              zIndex: -1,
+            }}
+          ></div>
+        </button>
+
+        {/* About Us Button */}
+        <Link to="/about-us" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              ...styles.aboutUsButton,
+              ...(isAboutUsHovered ? styles.aboutUsButtonHover : {}),
+              ...(isAboutUsPressed ? styles.aboutUsButtonPressed : {}),
+            }}
+            onMouseEnter={() => setIsAboutUsHovered(true)}
+            onMouseLeave={() => {
+              setIsAboutUsHovered(false);
+              setIsAboutUsPressed(false); // Reset pressed state on mouse leave
+            }}
+            onMouseDown={() => setIsAboutUsPressed(true)}
+            onMouseUp={() => setIsAboutUsPressed(false)}
+          >
+            About Us
+          </button>
+        </Link>
+      </div>
     </section>
   );
 };
@@ -309,6 +425,20 @@ const Dashboard = () => {
     } catch (err) {
       console.error(err);
       showPopupMessage("Failed to update shipment. Please try again.", "error");
+    }
+  };
+
+  // Handle shipment deletion
+  const handleDeleteShipment = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/shipments/${id}`);
+      const updatedShipments = shipments.filter(shipment => shipment.id !== id);
+      setShipments(updatedShipments);
+      setIsEditFormOpen(false);
+      showPopupMessage("Shipment deleted successfully!", "success");
+    } catch (err) {
+      console.error(err);
+      showPopupMessage("Failed to delete shipment. Please try again.", "error");
     }
   };
 
@@ -944,7 +1074,7 @@ const Dashboard = () => {
                 onMouseLeave={(e) => {
                   e.target.style.background = "linear-gradient(145deg, #f9f9f9, #ffffff)";
                   e.target.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
-                  e.target.style.borderColor = "#e0e0e0";
+                  e.target.style.borrowerColor = "#e0e0e0";
                 }}
                 required
               />
@@ -1058,13 +1188,15 @@ const Dashboard = () => {
                 >
                   Update Shipment
                 </button>
+                
+                {/* Delete Button */}
                 <button
                   type="button"
                   style={{
                     ...styles.button,
                     background: "linear-gradient(135deg, #ff4d4f, #ff7875)",
                   }}
-                  onClick={() => setIsEditFormOpen(false)}
+                  onClick={() => handleDeleteShipment(editShipmentData.id)}
                   onMouseEnter={(e) => {
                     e.target.style.transform = styles.buttonHover.transform;
                     e.target.style.boxShadow = styles.buttonHover.boxShadow;
@@ -1072,8 +1204,29 @@ const Dashboard = () => {
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.transform = "translateY(0)";
-                    e.target.style.boxShadow = styles.button.boxShadow;
+                    e.target.style.boxShadow = "none";
                     e.target.style.background = "linear-gradient(135deg, #ff4d4f, #ff7875)";
+                  }}
+                >
+                  Delete Shipment
+                </button>
+                
+                <button
+                  type="button"
+                  style={{
+                    ...styles.button,
+                    background: "linear-gradient(135deg, #6c757d, #adb5bd)",
+                  }}
+                  onClick={() => setIsEditFormOpen(false)}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = styles.buttonHover.transform;
+                    e.target.style.boxShadow = styles.buttonHover.boxShadow;
+                    e.target.style.background = "linear-gradient(135deg, #adb5bd, #6c757d)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = "translateY(0)";
+                    e.target.style.boxShadow = "none";
+                    e.target.style.background = "linear-gradient(135deg, #6c757d, #adb5bd)";
                   }}
                 >
                   Cancel
@@ -1158,14 +1311,14 @@ const Dashboard = () => {
                 }}
                 onClick={markAllAsRead}
                 onMouseEnter={(e) => {
-                  e.target.style.background = styles.buttonHover.background;
-                  e.target.style.transform = styles.buttonHover.transform;
-                  e.target.style.boxShadow = styles.buttonHover.boxShadow;
+                    e.target.style.background = styles.buttonHover.background;
+                    e.target.style.transform = styles.buttonHover.transform;
+                    e.target.style.boxShadow = styles.buttonHover.boxShadow;
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = "#6a11cb";
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "none";
+                    e.target.style.background = "#6a11cb";
+                    e.target.style.transform = "translateY(0)";
+                    e.target.style.boxShadow = "none";
                 }}
               >
                 <span style={{ fontSize: "1.2rem" }}>📨</span> 
@@ -1304,57 +1457,129 @@ const Dashboard = () => {
 const AboutUs = () => {
   const styles = {
     aboutUs: {
-      padding: "80px",
+      position: "relative",
+      padding: "60px 20px",
       marginTop: "60px",
       fontFamily: "'Poppins', sans-serif",
-      background: "#f5f5f5",
       minHeight: "100vh",
+      boxSizing: "border-box",
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    videoBackground: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      zIndex: -1,
+    },
+    videoOverlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      zIndex: -1,
+    },
+    content: {
+      position: "relative",
+      maxWidth: "800px",
+      margin: "0 auto",
+      padding: "30px",
+      background: "transparent",
+      backdropFilter: "none",
+      borderRadius: "15px",
+      border: "2.2px solid #fff",
+      boxShadow: "none",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    },
+    contentHover: {
+      transform: "translateY(-10px)",
+      boxShadow: "none",
     },
     header: {
       fontSize: "2.5rem",
       fontWeight: "bold",
       textAlign: "center",
       marginBottom: "20px",
-      color: "#343a40",
-    },
-    content: {
-      maxWidth: "800px",
-      margin: "0 auto",
-      padding: "20px",
-      background: "#fff",
-      borderRadius: "10px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      color: "#fff",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
     },
     sectionTitle: {
       fontSize: "2rem",
       fontWeight: "600",
-      marginBottom: "10px",
-      color: "#6a11cb",
+      marginBottom: "20px",
+      color: "#fff",
       textAlign: "center",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
     },
     team: {
       display: "flex",
       justifyContent: "space-around",
       marginTop: "20px",
+      flexWrap: "wrap",
     },
     teamMember: {
       textAlign: "center",
+      flex: "1 1 200px",
+      margin: "20px",
+      padding: "20px",
+      background: "transparent",
+      backdropFilter: "none",
+      borderRadius: "15px",
+      border: "1.8px solid #fff",
+      boxShadow: "none",
+      transition: "transform 0.3s ease, backdrop-filter 0.3s ease, opacity 0.3s ease",
+    },
+    teamMemberHover: {
+      transform: "translateY(-10px)",
+      // backdropFilter: "blur(10px)",
+      opacity: 0.8,
     },
     teamMemberName: {
       fontSize: "1.2rem",
       fontWeight: "600",
-      color: "#343a40",
+      color: "#fff",
+      marginBottom: "10px",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+      transition: "color 0.3s ease",
     },
     teamMemberRole: {
       fontSize: "0.9rem",
-      color: "#777",
+      color: "#ddd",
+      transition: "color 0.3s ease",
     },
     highlight: {
       color: "#6a11cb",
       fontWeight: "600",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
     },
-    // Media Queries for AboutUs
+    highlight2: {
+      color: "#2575fc",
+      fontWeight: "600",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+    },
+    "@keyframes textGradient": {
+      "0%": {
+        backgroundPosition: "0% 50%",
+      },
+      "50%": {
+        backgroundPosition: "100% 50%",
+      },
+      "100%": {
+        backgroundPosition: "0% 50%",
+      },
+    },
     "@media (max-width: 768px)": {
+      aboutUs: {
+        padding: "40px 10px",
+      },
       header: {
         fontSize: "2rem",
       },
@@ -1365,24 +1590,103 @@ const AboutUs = () => {
         flexDirection: "column",
         gap: "20px",
       },
+      teamMember: {
+        flex: "1 1 100%",
+        margin: "10px 0",
+      },
+    },
+    "@media (max-width: 480px)": {
+      header: {
+        fontSize: "1.8rem",
+      },
+      sectionTitle: {
+        fontSize: "1.3rem",
+      },
+      teamMemberName: {
+        fontSize: "1rem",
+      },
+      teamMemberRole: {
+        fontSize: "0.8rem",
+      },
     },
   };
 
   return (
     <div style={styles.aboutUs}>
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        style={styles.videoBackground}
+      >
+        <source
+          src="https://cdn.pixabay.com/video/2020/06/03/40984-427854579_large.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Video Overlay */}
+      <div style={styles.videoOverlay}></div>
+
+      {/* Content */}
       <h1 style={styles.header}>About Us</h1>
-      <div style={styles.content}>
-        <p>
-          At <span style={styles.highlight}>BiGeo</span>, we’re transforming the logistics industry. Using advanced technology, we design efficient and eco-friendly supply chains that help businesses thrive while ensuring unmatched dependability. We’re more than a delivery service—we’re shaping the future of a  global connectivity.
+      <div
+        style={{
+          ...styles.content,
+          ":hover": styles.contentHover,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = styles.contentHover.transform;
+          e.currentTarget.style.boxShadow = styles.contentHover.boxShadow;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = styles.content.boxShadow;
+        }}
+      >
+        <p style={{ color: "#fff", textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)" }}>
+          At <span style={styles.highlight}>BiGeo</span>, we’re transforming the logistics industry. Using advanced technology, we design efficient and eco-friendly supply chains that help businesses thrive while ensuring unmatched dependability. We’re more than a delivery service—we’re shaping the future of global connectivity.
         </p>
         <h2 style={styles.sectionTitle}>Our Team</h2>
         <div style={styles.team}>
-          <div style={styles.teamMember}>
-            <h3 style={styles.teamMemberName}>Nagaraju Devulapelly</h3>
+          <div
+            style={{
+              ...styles.teamMember,
+              ":hover": styles.teamMemberHover,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = styles.teamMemberHover.transform;
+              e.currentTarget.style.backdropFilter = styles.teamMemberHover.backdropFilter;
+              e.currentTarget.style.opacity = styles.teamMemberHover.opacity;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.backdropFilter = styles.teamMember.backdropFilter;
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            <h3 style={styles.teamMemberName}><span style={styles.highlight2}>Nagaraju Devulapelly</span></h3>
             <p style={styles.teamMemberRole}>Team Member 1</p>
           </div>
-          <div style={styles.teamMember}>
-            <h3 style={styles.teamMemberName}>Rahul Peddapally</h3>
+          <div
+            style={{
+              ...styles.teamMember,
+              ":hover": styles.teamMemberHover,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = styles.teamMemberHover.transform;
+              e.currentTarget.style.backdropFilter = styles.teamMemberHover.backdropFilter;
+              e.currentTarget.style.opacity = styles.teamMemberHover.opacity;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.backdropFilter = styles.teamMember.backdropFilter;
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            <h3 style={styles.teamMemberName}><span style={styles.highlight2}>Rahul Peddapally</span></h3>
             <p style={styles.teamMemberRole}>Team Member 2</p>
           </div>
         </div>
@@ -1391,75 +1695,129 @@ const AboutUs = () => {
   );
 };
 
+
+
+
+
 // ContactUs Component
 const ContactUs = () => {
   const styles = {
     contactUs: {
-      padding: "20px",
-      // marginTop: "60px",
+      position: "relative",
+      padding: "60px 20px",
+      marginTop: "60px",
       fontFamily: "'Poppins', sans-serif",
-      background: "#f5f5f5",
       minHeight: "100vh",
+      boxSizing: "border-box",
+      overflow: "hidden",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      textAlign: "center",
+    },
+    videoBackground: {
+      position: "fixed", // Fixed to prevent scrolling issues
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      zIndex: -1,
+    },
+    videoOverlay: {
+      position: "fixed", // Fixed to prevent scrolling issues
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay
+      zIndex: -1,
     },
     header: {
       fontSize: "2.5rem",
       fontWeight: "bold",
-      color: "#343a40",
+      textAlign: "center",
       marginBottom: "20px",
+      color: "#fff", // White text for better contrast
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)", // Text shadow for readability
     },
     form: {
+      position: "relative",
+      maxWidth: "500px",
+      width: "100%",
+      padding: "30px",
+      background: "transparent", // Transparent background
+      backdropFilter: "none", // Remove blur effect
+      borderRadius: "15px", // Rounded corners
+      border: "3px solid #fff", // White border
+      boxShadow: "none", // No box shadow
       display: "flex",
       flexDirection: "column",
       gap: "15px",
-      maxWidth: "500px",
-      width: "100%",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    },
+    formHover: {
+      transform: "translateY(-10px)",
+      boxShadow: "none", // No box shadow on hover
     },
     input: {
-      padding: "10px",
-      borderRadius: "5px",
-      border: "1px solid #ddd",
+      padding: "12px",
+      borderRadius: "8px",
+      border: "2.2px solid #fff", // White border
       fontSize: "1rem",
-    },
-    textarea: {
-      padding: "10px",
-      borderRadius: "5px",
-      border: "1px solid #ddd",
-      fontSize: "1rem",
-      minHeight: "150px",
-    },
-    button: {
-      padding: "10px",
-      background: "#6a11cb",
-      color: "white",
-      border: "none",
-      borderRadius: "5px",
-      cursor: "pointer",
-      fontSize: "1rem",
+      background: "#fff", // White background
+      color: "#343a40", // Dark text color
       transition: "all 0.3s ease",
     },
-    buttonHover: {
-      background: "#2575fc",
+    inputHover: {
+      borderColor: "#6a11cb", // Highlight border on hover
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     },
-    // Media Queries for ContactUs
+    textarea: {
+      padding: "12px",
+      borderRadius: "8px",
+      border: "2.2px solid #fff", // White border
+      fontSize: "1rem",
+      minHeight: "150px",
+      background: "#fff", // White background
+      color: "#343a40", // Dark text color
+      transition: "all 0.3s ease",
+    },
+    textareaHover: {
+      borderColor: "#6a11cb", // Highlight border on hover
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    },
+    button: {
+      padding: "12px",
+      background: "linear-gradient(45deg, #6a11cb, #2575fc)",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontSize: "1rem",
+      fontWeight: "600",
+      transition: "all 0.3s ease",
+      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+    },
+    buttonHover: {
+      background: "#2575fc", // Solid color on hover
+      transform: "scale(1.05)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.3)",
+    },
     "@media (max-width: 768px)": {
       header: {
         fontSize: "2rem",
       },
       input: {
-        padding: "8px",
+        padding: "10px",
         fontSize: "0.9rem",
       },
       textarea: {
-        padding: "8px",
+        padding: "10px",
         fontSize: "0.9rem",
       },
       button: {
-        padding: "8px",
+        padding: "10px",
         fontSize: "0.9rem",
       },
     },
@@ -1467,19 +1825,91 @@ const ContactUs = () => {
 
   return (
     <section id="contact-us" style={styles.contactUs}>
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        style={styles.videoBackground}
+      >
+        <source
+          src="https://cdn.pixabay.com/video/2020/06/03/40984-427854579_large.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Video Overlay */}
+      <div style={styles.videoOverlay}></div>
+
+      {/* Header */}
       <h1 style={styles.header}>Contact Us</h1>
-      <form style={styles.form}>
-        <input type="text" placeholder="Your Name" style={styles.input} />
-        <input type="email" placeholder="Your Email" style={styles.input} />
-        <textarea placeholder="Your Message" style={styles.textarea} />
+
+      {/* Form */}
+      <form
+        style={{
+          ...styles.form,
+          ":hover": styles.formHover,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = styles.formHover.transform;
+          e.currentTarget.style.boxShadow = styles.formHover.boxShadow;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = styles.form.boxShadow;
+        }}
+      required>
+        <input
+          type="text"
+          placeholder="Your Name"
+          style={styles.input}
+          onMouseEnter={(e) => {
+            e.target.style.borderColor = styles.inputHover.borderColor;
+            e.target.style.boxShadow = styles.inputHover.boxShadow;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.borderColor = "#fff";
+            e.target.style.boxShadow = "none";
+          }}
+        required/>
+        <input
+          type="email"
+          placeholder="Your Email"
+          style={styles.input}
+          onMouseEnter={(e) => {
+            e.target.style.borderColor = styles.inputHover.borderColor;
+            e.target.style.boxShadow = styles.inputHover.boxShadow;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.borderColor = "#fff";
+            e.target.style.boxShadow = "none";
+          }}
+       required/>
+        <textarea
+          placeholder="Your Message"
+          style={styles.textarea}
+          onMouseEnter={(e) => {
+            e.target.style.borderColor = styles.textareaHover.borderColor;
+            e.target.style.boxShadow = styles.textareaHover.boxShadow;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.borderColor = "#fff";
+            e.target.style.boxShadow = "none";
+          }}
+        required/>
         <button
           type="submit"
           style={styles.button}
           onMouseEnter={(e) => {
             e.target.style.background = styles.buttonHover.background;
+            e.target.style.transform = styles.buttonHover.transform;
+            e.target.style.boxShadow = styles.buttonHover.boxShadow;
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "#6a11cb";
+            e.target.style.background = "linear-gradient(45deg, #6a11cb, #2575fc)";
+            e.target.style.transform = "scale(1)";
+            e.target.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.2)";
           }}
         >
           Send Message
@@ -1493,63 +1923,111 @@ const ContactUs = () => {
 const TrackYourShipment = () => {
   const styles = {
     trackShipment: {
-      padding: "40px 20px",
+      position: "relative",
+      padding: "60px 20px",
       marginTop: "60px",
       fontFamily: "'Poppins', sans-serif",
-      background: "#f5f5f5",
       minHeight: "100vh",
+      boxSizing: "border-box",
+      overflow: "hidden",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      textAlign: "center",
+    },
+    videoBackground: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      zIndex: -1,
+    },
+    videoOverlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      zIndex: -1,
     },
     header: {
       fontSize: "2.5rem",
       fontWeight: "bold",
-      color: "#343a40",
-      marginBottom: "30px",
+      textAlign: "center",
+      marginBottom: "20px",
+      color: "#fff",
+      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
     },
     form: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "20px",
+      position: "relative",
       maxWidth: "500px",
       width: "100%",
-      marginBottom: "30px",
+      padding: "30px",
+      background: "transparent",
+      backdropFilter: "none",
+      borderRadius: "15px",
+      border: "3px solid #fff",
+      boxShadow: "none",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    },
+    formHover: {
+      transform: "translateY(-10px)",
+      boxShadow: "none",
     },
     input: {
       padding: "12px",
-      borderRadius: "5px",
-      border: "1px solid #ddd",
+      borderRadius: "8px",
+      border: "2.2px solid #fff",
       fontSize: "1rem",
+      background: "#fff",
+      color: "#343a40",
+      transition: "all 0.3s ease",
+    },
+    inputError: {
+      borderColor: "#ff4d4f",
+      color: "#ff4d4f",
+    },
+    inputHover: {
+      borderColor: "#6a11cb",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     },
     button: {
       padding: "12px",
-      background: "#6a11cb",
+      background: "linear-gradient(45deg, #6a11cb, #2575fc)",
       color: "white",
       border: "none",
-      borderRadius: "5px",
+      borderRadius: "8px",
       cursor: "pointer",
       fontSize: "1rem",
+      fontWeight: "600",
       transition: "all 0.3s ease",
+      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
     },
-    buttonHover: {
+    buttonActive: {
       background: "#2575fc",
+      transform: "scale(1.05)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.3)",
     },
     shipmentDetails: {
       marginTop: "30px",
       padding: "25px",
-      background: "#fff",
+      background: "rgba(255, 255, 255, 0.9)",
       borderRadius: "10px",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       width: "100%",
       maxWidth: "500px",
+      color: "#343a40",
+      textAlign: "center",
     },
     shipmentId: {
       fontSize: "1.2rem",
       fontWeight: "600",
-      color: "#343a40",
       marginBottom: "15px",
     },
     shipmentStatus: {
@@ -1562,37 +2040,41 @@ const TrackYourShipment = () => {
       fontSize: "0.9rem",
       color: "#2575fc",
       marginBottom: "5px",
-      transition: "margin-top 0.3s ease", // Smooth transition for margin-top
     },
     shipmentNotes: {
       fontSize: "0.9rem",
       color: "#ff4d4f",
       fontStyle: "italic",
       marginBottom: "5px",
-      transition: "margin-top 0.3s ease", // Smooth transition for margin-top
     },
     created_at: {
       fontSize: "0.8rem",
       color: "#4CAF50",
       fontStyle: "italic",
-      transition: "margin-top 0.3s ease", // Smooth transition for margin-top
     },
     error: {
       color: "#ff4d4f",
-      fontSize: "0.9rem",
-      marginTop: "20px",
+      fontSize: "1.2rem",
+      fontFamily: "'Poppins', sans-serif",
+      fontWeight: "600",
+      textAlign: "center",
+      textShadow: "2px 2px 4px rgba(255, 77, 79, 0.3)",
+      background: "linear-gradient(45deg, #ff4d4f, #ff8c8f)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      animation: "fadeIn 0.5s ease-in-out",
     },
     progressBarContainer: {
       width: "100%",
       marginTop: "20px",
-      marginBottom: "4px", // Added 4px gap below the progress bar
+      marginBottom: "4px",
       padding: "10px",
       borderRadius: "10px",
       transition: "all 0.3s ease",
     },
     progressBarContainerHover: {
       padding: "15px",
-      backgroundColor: "#f0f0f0",
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
     },
     progressBar: {
       width: "100%",
@@ -1614,7 +2096,7 @@ const TrackYourShipment = () => {
       marginTop: "20px",
       marginBottom: "20px",
       fontSize: "0.8rem",
-      color: "#666",
+      color: "#000",
       position: "relative",
     },
     stepPoint: {
@@ -1625,17 +2107,18 @@ const TrackYourShipment = () => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      cursor: "pointer", // Removed hover effect
+      cursor: "pointer",
+      color: "#000",
     },
     stepPointActive: {
       backgroundColor: "#6a11cb",
-      color: "white",
+      color: "#fff",
     },
     stepLabel: {
       position: "absolute",
       top: "25px",
       fontSize: "0.7rem",
-      color: "#666",
+      color: "#000",
     },
   };
 
@@ -1643,16 +2126,25 @@ const TrackYourShipment = () => {
   const [shipmentDetails, setShipmentDetails] = useState(null);
   const [error, setError] = useState("");
   const [isProgressBarHovered, setIsProgressBarHovered] = useState(false);
+  const [isInputInvalid, setIsInputInvalid] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!shipmentId.trim()) {
+      setIsInputInvalid(true);
+      setError("Please enter a valid shipment ID.");
+      return;
+    }
+
     try {
       const response = await axios.get(`http://localhost:5000/api/shipments/${shipmentId}`);
       setShipmentDetails(response.data);
       setError("");
+      setIsInputInvalid(false);
     } catch (err) {
       setShipmentDetails(null);
       setError("Shipment not found. Please check the ID and try again.");
+      setIsInputInvalid(true);
     }
   };
 
@@ -1675,42 +2167,76 @@ const TrackYourShipment = () => {
 
   return (
     <section id="track-your-shipment" style={styles.trackShipment}>
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        style={styles.videoBackground}
+      >
+        <source
+          src="https://cdn.pixabay.com/video/2020/06/03/40984-427854579_large.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Video Overlay */}
+      <div style={styles.videoOverlay}></div>
+
+      {/* Header */}
       <h1 style={styles.header}>Track Your Shipment</h1>
-      <form style={styles.form} onSubmit={handleSubmit}>
+
+      {/* Form */}
+      <form
+        style={{
+          ...styles.form,
+          ":hover": styles.formHover,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = styles.formHover.transform;
+          e.currentTarget.style.boxShadow = styles.formHover.boxShadow;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = styles.form.boxShadow;
+        }}
+        onSubmit={handleSubmit}
+      >
         <input
           type="text"
           placeholder="Enter Shipment ID (eg. 001,002,003,.....)"
           value={shipmentId}
-          onChange={(e) => setShipmentId(e.target.value)}
+          onChange={(e) => {
+            setShipmentId(e.target.value);
+            setIsInputInvalid(false); // Reset error state on input change
+          }}
           style={{
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #e0e0e0",
-            fontSize: "1rem",
-            background: "linear-gradient(145deg, #f9f9f9, #ffffff)",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
+            ...styles.input,
+            ...(isInputInvalid ? styles.inputError : {}),
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(145deg, #ffffff, #f0f0f0)";
-            e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-            e.target.style.borderColor = "#6a11cb";
+            e.target.style.borderColor = styles.inputHover.borderColor;
+            e.target.style.boxShadow = styles.inputHover.boxShadow;
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(145deg, #f9f9f9, #ffffff)";
-            e.target.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
-            e.target.style.borderColor = "#e0e0e0";
+            e.target.style.borderColor = isInputInvalid ? "#ff4d4f" : "#fff";
+            e.target.style.boxShadow = "none";
           }}
           required
         />
         <button
           type="submit"
           style={styles.button}
-          onMouseEnter={(e) => {
-            e.target.style.background = styles.buttonHover.background;
+          onMouseDown={(e) => {
+            e.target.style.background = styles.buttonActive.background;
+            e.target.style.transform = styles.buttonActive.transform;
+            e.target.style.boxShadow = styles.buttonActive.boxShadow;
           }}
-          onMouseLeave={(e) => {
-            e.target.style.background = "#6a11cb";
+          onMouseUp={(e) => {
+            e.target.style.background = "linear-gradient(45deg, #6a11cb, #2575fc)";
+            e.target.style.transform = "scale(1)";
+            e.target.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.2)";
           }}
         >
           Track Shipment
@@ -1745,7 +2271,7 @@ const TrackYourShipment = () => {
             </div>
           </div>
 
-          {/* Progress Steps with Points (No Hover Effect) (Optonal have to make?) */}
+          {/* Progress Steps with Points */}
           <div style={styles.progressSteps}>
             {steps.map((step, index) => (
               <div
@@ -1762,36 +2288,16 @@ const TrackYourShipment = () => {
           </div>
 
           {/* Current Location, Destination, Notes, and Created At */}
-          <div
-            style={{
-              ...styles.shipmentLocation,
-              marginTop: isProgressBarHovered ? "9px" : "5px", // Move down by 4px on hover
-            }}
-          >
+          <div style={styles.shipmentLocation}>
             Current Location: {shipmentDetails.current_location}
           </div>
-          <div
-            style={{
-              ...styles.shipmentLocation,
-              marginTop: isProgressBarHovered ? "9px" : "5px", // Move down by 4px on hover
-            }}
-          >
+          <div style={styles.shipmentLocation}>
             Destination: {shipmentDetails.destination_location}
           </div>
-          <div
-            style={{
-              ...styles.shipmentNotes,
-              marginTop: isProgressBarHovered ? "9px" : "5px", // Move down by 4px on hover
-            }}
-          >
+          <div style={styles.shipmentNotes}>
             Note: {shipmentDetails.notes}
           </div>
-          <div
-            style={{
-              ...styles.created_at,
-              marginTop: isProgressBarHovered ? "9px" : "5px", // Move down by 4px on hover
-            }}
-          >
+          <div style={styles.created_at}>
             Created At: {new Date(shipmentDetails.created_at).toLocaleString()}
           </div>
         </div>
@@ -1801,6 +2307,7 @@ const TrackYourShipment = () => {
     </section>
   );
 };
+
 
 // App Component
 const App = () => {
